@@ -5,3 +5,4 @@ scikit-learn==1.0.2
 requests==2.26.0
 googletrans==4.0.0-rc1
 openpyxl==3.0.9  # Required for reading Excel files
+unidecode==1.4.0  # Required for handling Vietnamese accents
