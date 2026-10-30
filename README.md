@@ -2,6 +2,10 @@
 
 [![CI](https://github.com/HongTin2104/VietNam-Travel-Recommendation-System/actions/workflows/ci.yml/badge.svg)](https://github.com/HongTin2104/VietNam-Travel-Recommendation-System/actions/workflows/ci.yml)
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://vietnam-travel-recsys.streamlit.app/)
+[![Release](https://img.shields.io/github/v/release/HongTin2104/VietNam-Travel-Recommendation-System)](https://github.com/HongTin2104/VietNam-Travel-Recommendation-System/releases)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)](pyproject.toml)
+[![Code: MIT](https://img.shields.io/badge/code-MIT-green)](LICENSE)
+[![Data: CC BY 4.0](https://img.shields.io/badge/data-CC%20BY%204.0-blue)](data/DATASET.md)
 
 Describe the trip you want in Vietnamese or English and get matching destinations from a hand-built dataset of
 315 places, organised by the 34 provinces in effect since July 2025.

@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this dataset or code, please cite it as below."
+title: "Vietnam Travel Recommendation System"
+type: software
+authors:
+  - alias: HongTin2104
+repository-code: "https://github.com/HongTin2104/VietNam-Travel-Recommendation-System"
+url: "https://vietnam-travel-recsys.streamlit.app/"
+abstract: >-
+  Content-based recommender for Vietnamese tourist destinations: 315 hand-curated
+  places across the 34 provinces in effect since July 2025, Vietnamese word
+  segmentation with underthesea, and TF-IDF ranking evaluated against baselines.
+keywords:
+  - vietnam
+  - tourism
+  - recommender system
+  - vietnamese nlp
+  - dataset
+license: MIT
+version: 1.1.0
+date-released: "2026-10-30"

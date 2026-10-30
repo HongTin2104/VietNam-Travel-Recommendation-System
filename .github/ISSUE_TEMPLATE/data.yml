@@ -1,0 +1,23 @@
+name: Fix or add a place
+description: A place with a wrong province, description or image, or a place that is missing
+labels: [data]
+body:
+  - type: input
+    id: place
+    attributes:
+      label: Place
+      description: Name, and its `id` from data/processed/places.csv if it is already in the dataset.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong or missing
+      description: For example the province after the July 2025 merger, a broken image link, or a short description of a new place.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: A link that supports the change (official tourism site, provincial portal, Wikipedia...).
