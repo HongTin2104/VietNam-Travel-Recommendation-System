@@ -114,9 +114,14 @@ def test_is_image(response, expected):
 
 def test_link_check_counts_broken_links_by_host(tmp_path, monkeypatch, capsys):
     (tmp_path / "data" / "processed").mkdir(parents=True)
-    pd.DataFrame({"image_url": ["https://ok.vn/a.jpg", "https://dead.vn/b.jpg", "https://dead.vn/c.jpg", ""]}).to_csv(
-        tmp_path / "data" / "processed" / "places.csv", index=False
-    )
+    pd.DataFrame(
+        {
+            "id": [1, 2, 3, 4],
+            "name": ["Good", "Broken", "Timeout", "Missing"],
+            "old_province": ["Hà Nội"] * 4,
+            "image_url": ["https://ok.vn/a.jpg", "https://dead.vn/b.jpg", "https://dead.vn/c.jpg", ""],
+        }
+    ).to_csv(tmp_path / "data" / "processed" / "places.csv", index=False)
     session = FakeSession(
         {
             "https://ok.vn/a.jpg": FakeResponse(),
@@ -131,6 +136,67 @@ def test_link_check_counts_broken_links_by_host(tmp_path, monkeypatch, capsys):
     check_image_links.main()
 
     assert capsys.readouterr().out.strip() == ("1/4 image links work; broken by host: {'dead.vn': 2, '(missing)': 1}")
+
+
+def test_link_check_writes_broken_rows_and_preserves_request_delay(tmp_path, monkeypatch):
+    (tmp_path / "data" / "processed").mkdir(parents=True)
+    places = pd.DataFrame(
+        {
+            "id": [1, 2, 3, 4, 5],
+            "name": ["Working", 'Bãi biển, "đẹp"', "Error", "Not an image", "Missing"],
+            "old_province": ["Khánh Hòa"] * 5,
+            "image_url": [
+                "https://ok.vn/a.jpg",
+                "https://dead.vn/b.jpg",
+                "https://dead.vn/c.jpg",
+                "https://html.vn/d",
+                "",
+            ],
+        }
+    )
+    places.to_csv(tmp_path / "data" / "processed" / "places.csv", index=False)
+    session = FakeSession(
+        {
+            "https://ok.vn/a.jpg": FakeResponse(),
+            "https://dead.vn/b.jpg": FakeResponse(status_code=404),
+            "https://dead.vn/c.jpg": requests.ConnectionError(),
+            "https://html.vn/d": FakeResponse(content_type="text/html"),
+        }
+    )
+    sleeps = []
+    monkeypatch.setattr(check_image_links, "ROOT", tmp_path)
+    monkeypatch.setattr(check_image_links.requests, "Session", lambda: session)
+    monkeypatch.setattr(check_image_links.time, "sleep", sleeps.append)
+
+    check_image_links.main()
+
+    report = pd.read_csv(tmp_path / "reports" / "broken_images.csv", keep_default_na=False)
+    pd.testing.assert_frame_equal(report, places.iloc[1:].reset_index(drop=True))
+    assert sleeps == [0.2] * len(places)
+
+
+def test_link_check_overwrites_stale_report_with_headers_when_all_work(tmp_path, monkeypatch):
+    (tmp_path / "data" / "processed").mkdir(parents=True)
+    (tmp_path / "reports").mkdir()
+    report_path = tmp_path / "reports" / "broken_images.csv"
+    report_path.write_text("stale results\n", encoding="utf-8")
+    pd.DataFrame(
+        {
+            "id": [1],
+            "name": ["Working"],
+            "old_province": ["Hà Nội"],
+            "image_url": ["https://ok.vn/a.jpg"],
+        }
+    ).to_csv(tmp_path / "data" / "processed" / "places.csv", index=False)
+    monkeypatch.setattr(check_image_links, "ROOT", tmp_path)
+    monkeypatch.setattr(
+        check_image_links.requests, "Session", lambda: FakeSession({"https://ok.vn/a.jpg": FakeResponse()})
+    )
+    monkeypatch.setattr(check_image_links.time, "sleep", lambda _: None)
+
+    check_image_links.main()
+
+    assert report_path.read_text(encoding="utf-8") == "id,name,old_province,image_url\n"
 
 
 INTERSTITIAL = """

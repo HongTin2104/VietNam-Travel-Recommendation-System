@@ -14,6 +14,10 @@ the 34 provincial units in effect since 1 July 2025.
 | Collected | 2024, compiled by hand by the repository author |
 | Working image links | 247 of 315 (checked 2026-10-30 with `scripts/check_image_links.py`) |
 
+Running `python scripts/check_image_links.py` also writes `reports/broken_images.csv` with the
+`id`, `name`, `old_province` and `image_url` of every broken or missing image, so contributors can
+identify the places that need replacement links. The script keeps a 0.2-second delay per place.
+
 ## Files
 
 | File | Description |
