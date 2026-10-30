@@ -1,0 +1,30 @@
+name: Bad recommendation or bug
+description: A query that returns the wrong places, or something in the app that does not work
+labels: [bug]
+body:
+  - type: input
+    id: query
+    attributes:
+      label: Query
+      description: Exactly what you typed, and the province filter if you used one.
+      placeholder: bãi biển yên tĩnh có san hô
+    validations:
+      required: true
+  - type: textarea
+    id: got
+    attributes:
+      label: What you got
+      description: The top results, or the error message.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: The online demo, or local (Python version, how you started it).
