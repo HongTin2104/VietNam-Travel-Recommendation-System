@@ -46,6 +46,20 @@ jobs:
         if: matrix.python-version == '3.12'
         run: coverage report --format=markdown >> "$GITHUB_STEP_SUMMARY"
 
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker build -t vietnam-travel .
+      - run: docker run -d -p 8501:8501 vietnam-travel
+      - name: Wait for Streamlit health endpoint
+        run: |
+          for i in $(seq 1 10); do
+            status=$(curl -sf http://localhost:8501/_stcore/health 2>/dev/null) && [ "$status" = "ok" ] && exit 0
+            sleep 3
+          done
+          echo "Streamlit did not become healthy after 30s" && exit 1
+
   # The README quotes reports/evaluation.md, so it must be what the script produces today.
   metrics:
     runs-on: ubuntu-latest
