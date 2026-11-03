@@ -3,6 +3,150 @@ import re
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from underthesea import word_tokenize
+from unidecode import unidecode
+
+# Common Vietnamese syllables without diacritics — used to detect unaccented Vietnamese
+# queries so they are not mistakenly treated as English.
+_VI_SYLLABLES = {
+    "ba",
+    "bac",
+    "bai",
+    "ban",
+    "bay",
+    "be",
+    "bien",
+    "bo",
+    "bong",
+    "bui",
+    "cai",
+    "cao",
+    "cat",
+    "cau",
+    "cay",
+    "cha",
+    "chau",
+    "cho",
+    "chua",
+    "co",
+    "cung",
+    "da",
+    "dai",
+    "dau",
+    "dao",
+    "dep",
+    "dia",
+    "dinh",
+    "dong",
+    "duc",
+    "duong",
+    "ga",
+    "gia",
+    "giai",
+    "go",
+    "hai",
+    "hang",
+    "hien",
+    "hoa",
+    "hoang",
+    "hoi",
+    "hong",
+    "hue",
+    "hung",
+    "huong",
+    "khe",
+    "khu",
+    "ky",
+    "la",
+    "lac",
+    "lang",
+    "lao",
+    "len",
+    "linh",
+    "lua",
+    "lung",
+    "luong",
+    "ly",
+    "ma",
+    "moc",
+    "moi",
+    "mua",
+    "muong",
+    "ngan",
+    "ngam",
+    "ngo",
+    "ngon",
+    "nha",
+    "nhat",
+    "nhieu",
+    "nho",
+    "ninh",
+    "nui",
+    "nung",
+    "pho",
+    "phong",
+    "phu",
+    "que",
+    "quoc",
+    "rang",
+    "rung",
+    "san",
+    "sao",
+    "sau",
+    "so",
+    "song",
+    "suon",
+    "tam",
+    "tan",
+    "tay",
+    "thanh",
+    "thap",
+    "thieng",
+    "thu",
+    "thung",
+    "thuy",
+    "tien",
+    "toan",
+    "trang",
+    "tre",
+    "tri",
+    "tu",
+    "tung",
+    "tuong",
+    "vach",
+    "van",
+    "viet",
+    "vinh",
+    "vo",
+    "vu",
+    "xa",
+    "xanh",
+    "xom",
+    "xuong",
+}
+
+
+def is_unaccented_vietnamese(text: str) -> bool:
+    """Return True when text looks like Vietnamese typed without diacritics.
+
+    Requires at least two tokens that match known Vietnamese syllables so that
+    short, ambiguous inputs default to the existing translation path.
+    """
+    if not text.isascii():
+        return False
+    tokens = text.lower().split()
+    vi_count = sum(1 for t in tokens if t in _VI_SYLLABLES)
+    return vi_count >= 2
+
+
+def remove_diacritics(text: str) -> str:
+    """Strip Vietnamese diacritics using unidecode (đ→d, ơ→o, â→a, etc.)."""
+    return unidecode(text)
+
+
+def build_features_unaccented(text: str) -> str:
+    """Like build_features but for unaccented queries: strip diacritics first."""
+    return build_features(remove_diacritics(text))
+
 
 # Tạo danh sách stopwords (từ không mang nghĩa)
 vietnamese_stopwords = [
@@ -63,5 +207,6 @@ def build_vectorizer():
 def load_and_process_data(file_path):
     df = pd.read_csv(file_path, keep_default_na=False)
     df["description_tokens"] = df["description"].apply(build_features)
+    df["description_tokens_unaccented"] = df["description"].apply(lambda d: build_features(remove_diacritics(d)))
     df = df[df["description_tokens"].str.strip() != ""].reset_index(drop=True)
     return df

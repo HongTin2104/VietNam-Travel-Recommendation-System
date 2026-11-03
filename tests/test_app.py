@@ -122,3 +122,13 @@ def test_weather_without_an_icon_shows_no_image(monkeypatch):
     at = search(run_app(), "bãi biển")
     assert "**Thời tiết:** trời nắng" in markdown(at)
     assert len(at.get("imgs")) == 0
+
+
+def test_unaccented_vietnamese_is_not_translated(monkeypatch):
+    """Queries like 'bai bien hoang so' should search directly, not go to the translator."""
+    translated = []
+    monkeypatch.setattr(translation, "translate_to_vietnamese", lambda t: translated.append(t) or "")
+    at = search(run_app(), "bai bien hoang so")
+    assert translated == [], "translator must not be called for unaccented Vietnamese"
+    assert not at.info, "no 'Detected English' info message should appear"
+    assert len(at.subheader) == 3

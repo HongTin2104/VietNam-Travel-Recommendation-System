@@ -1,6 +1,12 @@
 import streamlit as st
 
-from data_processing import build_features, build_vectorizer, load_and_process_data
+from data_processing import (
+    build_features,
+    build_features_unaccented,
+    build_vectorizer,
+    is_unaccented_vietnamese,
+    load_and_process_data,
+)
 from recommendation import recommend_places
 from translation import translate_to_vietnamese
 from weather import get_api_key, get_weather
@@ -13,10 +19,11 @@ ALL_PROVINCES = "Tất cả 34 tỉnh, thành"
 def load_model():
     df = load_and_process_data(DATA_PATH)
     tfidf = build_vectorizer().fit(df["description_tokens"])
-    return df, tfidf
+    tfidf_unaccented = build_vectorizer().fit(df["description_tokens_unaccented"])
+    return df, tfidf, tfidf_unaccented
 
 
-df, tfidf = load_model()
+df, tfidf, tfidf_unaccented = load_model()
 
 st.title("Vietnam Travel Recommendation System")
 st.caption("Dữ liệu đã cập nhật theo 34 tỉnh, thành sau sáp nhập (từ 1/7/2025).")
@@ -28,7 +35,10 @@ if st.button("Tìm kiếm"):
     if not user_input.strip():
         st.error("Vui lòng nhập mô tả mong muốn.")
     else:
-        if user_input.isascii():
+        vi_unaccented = is_unaccented_vietnamese(user_input)
+        if vi_unaccented:
+            preprocess_fn = build_features_unaccented
+        elif user_input.isascii():
             st.info("Phát hiện ngôn ngữ là tiếng Anh. Đang dịch sang tiếng Việt...")
             translated = translate_to_vietnamese(user_input)
             if translated:
@@ -36,13 +46,18 @@ if st.button("Tìm kiếm"):
                 st.write(f"Mô tả: {user_input}")
             else:
                 st.warning("Không dịch được, sẽ tìm kiếm với nội dung gốc.")
+            preprocess_fn = build_features
+        else:
+            preprocess_fn = build_features
 
         recommendations = recommend_places(
             user_input,
             df,
             tfidf,
-            build_features,
+            preprocess_fn,
             province=None if province == ALL_PROVINCES else province,
+            tfidf_unaccented=tfidf_unaccented,
+            unaccented_query=vi_unaccented,
         )
 
         if recommendations.empty:

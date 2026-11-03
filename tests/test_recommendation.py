@@ -1,7 +1,14 @@
 import pandas as pd
 import pytest
 
-from data_processing import build_features, build_vectorizer, load_and_process_data, preprocess_text
+from data_processing import (
+    build_features,
+    build_features_unaccented,
+    build_vectorizer,
+    is_unaccented_vietnamese,
+    load_and_process_data,
+    preprocess_text,
+)
 from recommendation import recommend_places
 
 
@@ -66,3 +73,59 @@ def test_results_are_sorted_by_similarity(model):
     result = recommend_places("chùa cổ", df, tfidf, build_features, num_recommendations=5)
     assert len(result) == 5
     assert result["similarity"].is_monotonic_decreasing
+
+
+def test_is_unaccented_vietnamese_detects_common_queries():
+    assert is_unaccented_vietnamese("bai bien hoang so lan ngam san ho")
+    assert is_unaccented_vietnamese("nui rung hoang da")
+    assert is_unaccented_vietnamese("chua co linh thieng")
+
+
+def test_is_unaccented_vietnamese_rejects_english():
+    assert not is_unaccented_vietnamese("wild beach snorkeling")
+    assert not is_unaccented_vietnamese("ancient temple mountain")
+
+
+def test_is_unaccented_vietnamese_rejects_accented_text():
+    assert not is_unaccented_vietnamese("bãi biển hoang sơ")
+
+
+@pytest.fixture(scope="module")
+def unaccented_model():
+    df = load_and_process_data("data/processed/places.csv")
+    tfidf = build_vectorizer().fit(df["description_tokens"])
+    tfidf_unaccented = build_vectorizer().fit(df["description_tokens_unaccented"])
+    return df, tfidf, tfidf_unaccented
+
+
+def test_unaccented_query_finds_beach_results(unaccented_model):
+    df, tfidf, tfidf_unaccented = unaccented_model
+    result = recommend_places(
+        "bai bien hoang so lan ngam san ho",
+        df,
+        tfidf,
+        build_features_unaccented,
+        tfidf_unaccented=tfidf_unaccented,
+        unaccented_query=True,
+    )
+    assert len(result) == 3
+    assert result["similarity"].iloc[0] > 0
+    # Top result should be about the sea/beach.
+    assert "biển" in result["description"].iloc[0]
+
+
+def test_unaccented_query_beats_accented_tfidf(unaccented_model):
+    """Routing through the unaccented index should give higher similarity than
+    passing the raw unaccented query through the accented TF-IDF."""
+    df, tfidf, tfidf_unaccented = unaccented_model
+    query = "bai bien hoang so"
+    result_unaccented = recommend_places(
+        query,
+        df,
+        tfidf,
+        build_features_unaccented,
+        tfidf_unaccented=tfidf_unaccented,
+        unaccented_query=True,
+    )
+    result_accented = recommend_places(query, df, tfidf, build_features)
+    assert result_unaccented["similarity"].iloc[0] > result_accented["similarity"].iloc[0]
