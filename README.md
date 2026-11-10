@@ -66,10 +66,10 @@ tagged places). Reproduce with `python scripts/evaluate.py`.
 |---|---|---|---|
 | Random (200 shuffles) | 0.036 | 0.049 | 0.123 |
 | Highest rating first | 0.022 | 0.043 | 0.089 |
-| TF-IDF, syllables (no word segmentation) | 0.196 | 0.349 | 0.342 |
-| TF-IDF, syllable 1-2 grams | 0.188 | 0.347 | 0.352 |
-| TF-IDF, underthesea words | 0.181 | 0.292 | 0.348 |
-| **TF-IDF, words + syllables, 1-2 grams (app)** | **0.217** | **0.350** | **0.373** |
+| TF-IDF, syllables (no word segmentation) | 0.203 | 0.354 | 0.345 |
+| TF-IDF, syllable 1-2 grams | 0.196 | 0.350 | 0.355 |
+| TF-IDF, underthesea words | 0.181 | 0.293 | 0.351 |
+| **TF-IDF, words + syllables, 1-2 grams (app)** | **0.217** | **0.358** | **0.378** |
 
 Word segmentation alone does worse than plain syllables on recall. Adding the syllables back gives the best score
 on all three metrics, though with 46 queries the gaps between the TF-IDF variants are small.

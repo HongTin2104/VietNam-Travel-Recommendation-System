@@ -53,7 +53,6 @@ identify the places that need replacement links. The script keeps a 0.2-second d
 
 ## Known issues
 
-
 - Some places share a name across provinces because they span a border or are different sites with the same name:
   Cầu Mỹ Thuận, Hồ Dầu Tiếng, Thiền Viện Trúc Lâm, Động Thiên Cung.
 - Descriptions are short and uneven in length, which limits how well TF-IDF can tell places apart.
