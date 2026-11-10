@@ -53,10 +53,6 @@ identify the places that need replacement links. The script keeps a 0.2-second d
 
 ## Known issues
 
-- Id 60 is named "Hồ Ba Bể" under Ninh Thuận, but its description is a salt-water lake in Ninh Thuận. Hồ Ba Bể is
-  in Bắc Kạn (id 156). The name is probably wrong.
-- Id 304 is listed under Hậu Giang while its description says "Vườn cò Tân Long (Vĩnh Long)"; id 98 has the same
-  name under Sóc Trăng.
 - Some places share a name across provinces because they span a border or are different sites with the same name:
   Cầu Mỹ Thuận, Hồ Dầu Tiếng, Thiền Viện Trúc Lâm, Động Thiên Cung.
 - Descriptions are short and uneven in length, which limits how well TF-IDF can tell places apart.
