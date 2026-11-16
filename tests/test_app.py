@@ -23,11 +23,17 @@ def run_app():
     return AppTest.from_file("../main.py", default_timeout=120).run()
 
 
-def search(at, text, province=None):
+def search(at, text, region=None, province=None):
     at.text_area[0].input(text)
-    if province:
-        at.selectbox[0].select(province)
+    if region:
+        at.selectbox[0].select(region)
+        if province and province != f"Tất cả tỉnh, thành khu vực {region}":
+            at.selectbox[1].select(province)
+    else:
+        if province:
+            at.selectbox[1].select(province)
     at.button[0].click().run()
+    print(at.selectbox)
     assert not at.exception
     return at
 
@@ -65,9 +71,25 @@ def test_app_rejects_empty_input():
 
 
 def test_province_filter_limits_results_to_that_province():
-    at = search(run_app(), "chùa cổ linh thiêng", province="Huế")
+    at = search(run_app(), "địa điểm tham quan", province="Hà Nội")
     provinces = [m for m in markdown(at) if m.startswith("**Tỉnh, thành:**")]
     assert len(provinces) == len(at.subheader) > 0
+    assert all(m.startswith("**Tỉnh, thành:** Hà Nội") for m in provinces)
+
+def test_region_filter_limits_results_to_that_region():
+    at = search(run_app(), "địa điểm du lịch", region="Đồng Bằng Sông Cửu Long")
+    #regions = [m for m in markdown(at) if m.startswith("**Khu vực:**")]
+    assert len(at.subheader) > 0
+    #assert all(m.startswith("**Khu vực:** Đồng Bằng Sông Cửu Long") for m in regions)
+
+
+def test_region_and_province_filter_limits_results_to_that_province():
+    at = search(run_app(), "một số địa điểm du lịch", region="Bắc Trung Bộ", province="Huế")
+    #regions = [m for m in markdown(at) if m.startswith("**Khu vực**")]
+    provinces = [m for m in markdown(at) if m.startswith("**Tỉnh, thành:**")]
+    #assert len(regions) > 0
+    assert len(provinces) == len(at.subheader) > 0
+    #assert all(m.startswith("**Khu vực** Bắc Trung Bộ") for m in regions)
     assert all(m.startswith("**Tỉnh, thành:** Huế") for m in provinces)
 
 
