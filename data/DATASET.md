@@ -5,14 +5,14 @@
 315 tourist destinations, five for each of Vietnam's 63 pre-2025 provinces. Each place is also mapped to one of
 the 34 provincial units in effect since 1 July 2025.
 
-| | |
-|---|---|
-| Records | 315 |
-| Provinces (before 1 July 2025) | 63, five places each |
-| Provinces (from 1 July 2025) | 34; 11 with 5 places, 17 with 10, 6 with 15 |
-| Language | Vietnamese |
-| Collected | 2024, compiled by hand by the repository author |
-| Working image links | 247 of 315 (checked 2026-10-30 with `scripts/check_image_links.py`) |
+|                                |                                                                     |
+| ------------------------------ | ------------------------------------------------------------------- |
+| Records                        | 315                                                                 |
+| Provinces (before 1 July 2025) | 63, five places each                                                |
+| Provinces (from 1 July 2025)   | 34; 11 with 5 places, 17 with 10, 6 with 15                         |
+| Language                       | Vietnamese                                                          |
+| Collected                      | 2024, compiled by hand by the repository author                     |
+| Working image links            | 247 of 315 (checked 2026-10-30 with `scripts/check_image_links.py`) |
 
 Running `python scripts/check_image_links.py` also writes `reports/broken_images.csv` with the
 `id`, `name`, `old_province` and `image_url` of every broken or missing image, so contributors can
@@ -20,24 +20,26 @@ identify the places that need replacement links. The script keeps a 0.2-second d
 
 ## Files
 
-| File | Description |
-|---|---|
-| `DataSet.xlsx` | The original hand-compiled sheet. Kept unchanged. |
-| `short_links.csv` | `surl.li` image links from the sheet and the image URLs they point to (`scripts/resolve_short_links.py`). |
-| `processed/places.csv` | The cleaned table the app reads, built with `python scripts/build_dataset.py`. |
+| File                   | Description                                                                                               |
+| ---------------------- | --------------------------------------------------------------------------------------------------------- |
+| `DataSet.xlsx`         | The original hand-compiled sheet. Kept unchanged.                                                         |
+| `short_links.csv`      | `surl.li` image links from the sheet and the image URLs they point to (`scripts/resolve_short_links.py`). |
+| `processed/places.csv` | The cleaned table the app reads, built with `python scripts/build_dataset.py`.                            |
 
 ## Columns of `processed/places.csv`
 
-| Column | Type | Description |
-|---|---|---|
-| `id` | int | Row number from the original sheet (`STT`). |
-| `name` | str | Name of the destination. |
-| `province` | str | Province or centrally governed city since 1 July 2025 (34 units). |
-| `old_province` | str | Province before 1 July 2025 (63 units), as in the original sheet. |
-| `description` | str | Short Vietnamese description, median 148 characters. Used for the TF-IDF model. |
-| `rating` | float | Rating out of 5 as written in the sheet. One value is missing. |
-| `keywords` | str | Comma-separated tags. Empty for 100 places. |
-| `image_url` | str | Link to an image hosted by a third party. Empty when the sheet had no usable URL (6 places). |
+| Column         | Type  | Description                                                                                  |
+| -------------- | ----- | -------------------------------------------------------------------------------------------- |
+| `id`           | int   | Row number from the original sheet (`STT`).                                                  |
+| `name`         | str   | Name of the destination.                                                                     |
+| `province`     | str   | Province or centrally governed city since 1 July 2025 (34 units).                            |
+| `old_province` | str   | Province before 1 July 2025 (63 units), as in the original sheet.                            |
+| `region`       | str   | Region where a province located since 1 July 2025 (6 regions).                               |
+| `old_region`   | str   | Region where a province located before 1 July 2025.                                          |
+| `description`  | str   | Short Vietnamese description, median 148 characters. Used for the TF-IDF model.              |
+| `rating`       | float | Rating out of 5 as written in the sheet. One value is missing.                               |
+| `keywords`     | str   | Comma-separated tags. Empty for 100 places.                                                  |
+| `image_url`    | str   | Link to an image hosted by a third party. Empty when the sheet had no usable URL (6 places). |
 
 ## Processing (`scripts/build_dataset.py`)
 
