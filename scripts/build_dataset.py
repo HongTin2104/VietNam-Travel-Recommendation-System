@@ -5,7 +5,7 @@ import unicodedata
 from pathlib import Path
 
 import pandas as pd
-from province_mapping import OLD_TO_NEW
+from province_mapping import OLD_TO_NEW, MAPPED_REGIONS_WITH_PROVINCES, NEW_REGIONS_MAPPED
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "data" / "DataSet.xlsx"
@@ -57,6 +57,7 @@ def build(source=SOURCE):
     raw.columns = [clean_text(c) for c in raw.columns]
 
     old_province = raw["Vị trí"].map(clean_text).replace(TYPOS)
+    old_region = old_province.map(OLD_TO_NEW).map(MAPPED_REGIONS_WITH_PROVINCES)
     unknown = sorted(set(old_province) - set(OLD_TO_NEW))
     if unknown:
         raise ValueError(f"Provinces missing from the mapping: {unknown}")
@@ -67,6 +68,8 @@ def build(source=SOURCE):
             "name": raw["Tên địa điểm"].map(clean_text),
             "province": old_province.map(OLD_TO_NEW),
             "old_province": old_province,
+            "region": old_province.map(OLD_TO_NEW).map(NEW_REGIONS_MAPPED),
+            "old_region": old_region,
             "description": raw["Mô tả"].map(clean_text),
             "rating": raw["Đánh giá"].map(parse_rating),
             "keywords": raw["Từ Khóa"].map(parse_keywords),
