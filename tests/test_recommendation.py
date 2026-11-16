@@ -46,6 +46,14 @@ def test_recommends_beaches_for_beach_query(model):
     assert result["description"].str.contains("biển").all()
 
 
+def test_region_filter_uses_new_regions(model):
+    df, tfidf = model
+    result = recommend_places("một số địa điểm du lịch", df, tfidf, build_features, region="Duyên Hải Nam Trung Bộ Và Tây Nguyên")
+    assert len(result) == 3
+    assert set(result["province"]) <= {"Lâm Đồng", "Đắk Lắk", "Gia Lai", "Đà Nẵng", "Quảng Ngãi", "Khánh Hòa"}
+    assert set(result["old_province"]) <= {"Lâm Đồng", "Đắk Nông", "Bình Thuận", "Đắk Lắk", "Phú Yên", "Gia Lai", "Bình Định", "Đà Nẵng", "Quảng Nam", "Quảng Ngãi", "Kon Tum", "Khánh Hòa", "Ninh Thuận"}
+
+
 def test_province_filter_uses_new_provinces(model):
     df, tfidf = model
     result = recommend_places("di tích lịch sử", df, tfidf, build_features, province="Ninh Bình")
