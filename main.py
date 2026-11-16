@@ -10,10 +10,13 @@ from data_processing import (
 from recommendation import recommend_places
 from translation import translate_to_vietnamese
 from weather import get_api_key, get_weather
+import sys
+sys.path.append(".\\scripts")
+import province_mapping
 
 DATA_PATH = "data/processed/places.csv"
 ALL_PROVINCES = "Tất cả 34 tỉnh, thành"
-
+ALL_REGIONS = "Tất cả 6 khu vực sau sáp nhập (từ 1/7/2025)"
 
 @st.cache_resource
 def load_model():
@@ -29,8 +32,13 @@ st.title("Vietnam Travel Recommendation System")
 st.caption("Dữ liệu đã cập nhật theo 34 tỉnh, thành sau sáp nhập (từ 1/7/2025).")
 
 user_input = st.text_area("Nhập mô tả mong muốn của bạn:")
-province = st.selectbox("Tỉnh, thành", [ALL_PROVINCES, *sorted(df["province"].unique())])
-
+region = st.selectbox("Khu vực", [ALL_REGIONS, *sorted(df["region"].unique())])
+provinces_in_region = sorted(list(dict.fromkeys([row["province"] for _, row in df.iterrows() if region == row["region"]])))
+if region == ALL_REGIONS:
+    province = st.selectbox("Tỉnh, thành", [ALL_PROVINCES, *sorted(df["province"].unique())], key = "unit_select")
+    region = ALL_REGIONS if province == ALL_PROVINCES else province_mapping.NEW_REGIONS_MAPPED.get(province)
+else:
+    province = st.selectbox("Tỉnh, thành", [f"Tất cả tỉnh, thành khu vực {region}", *provinces_in_region], key = "unit_select")
 if st.button("Tìm kiếm"):
     if not user_input.strip():
         st.error("Vui lòng nhập mô tả mong muốn.")
@@ -55,7 +63,8 @@ if st.button("Tìm kiếm"):
             df,
             tfidf,
             preprocess_fn,
-            province=None if province == ALL_PROVINCES else province,
+            region=None if region == ALL_REGIONS else region,
+            province=None if (province == ALL_PROVINCES or province == f"Tất cả tỉnh, thành khu vực {region}") else province,
             tfidf_unaccented=tfidf_unaccented,
             unaccented_query=vi_unaccented,
         )
