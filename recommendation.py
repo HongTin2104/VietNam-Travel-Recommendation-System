@@ -10,6 +10,7 @@ def recommend_places(
     tfidf,
     preprocess_text,
     num_recommendations=3,
+    region=None,
     province=None,
     tfidf_unaccented=None,
     unaccented_query=False,
@@ -24,8 +25,10 @@ def recommend_places(
     input_text = preprocess_text(user_input)
     if not input_text:
         return pd.DataFrame(columns=RESULT_COLUMNS)
-
-    candidates = df if province is None else df[df["province"] == province]
+    if region:
+        candidates = df[df["region"] == region] if province is None else df[df["province"] == province]
+    else:
+        candidates = df if province is None else df[df["province"] == province]
     if candidates.empty:
         return pd.DataFrame(columns=RESULT_COLUMNS)
 
