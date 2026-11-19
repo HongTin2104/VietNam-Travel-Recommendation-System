@@ -10,7 +10,11 @@ from data_processing import (
     preprocess_text,
 )
 from recommendation import recommend_places
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
+from province_mapping import REGIONS
 
 @pytest.fixture(scope="module")
 def model():
@@ -49,7 +53,7 @@ def test_recommends_beaches_for_beach_query(model):
 def test_region_filter_uses_new_regions(model):
     df, tfidf = model
     result = recommend_places(
-        "một số địa điểm du lịch", df, tfidf, build_features, region="Duyên Hải Nam Trung Bộ Và Tây Nguyên"
+        "một số địa điểm du lịch", df, tfidf, build_features, region="Duyên hải Nam Trung Bộ và Tây Nguyên"
     )
     assert len(result) == 3
     assert set(result["province"]) <= {"Lâm Đồng", "Đắk Lắk", "Gia Lai", "Đà Nẵng", "Quảng Ngãi", "Khánh Hòa"}
@@ -68,6 +72,14 @@ def test_region_filter_uses_new_regions(model):
         "Khánh Hòa",
         "Ninh Thuận",
     }
+
+
+def test_filter_result_province_exactly_from_region(model):
+    regions = REGIONS.keys()
+    df, tfidf = model
+    for rg in regions:
+        result = recommend_places("địa điểm tham quan", df, tfidf, build_features, region=rg)
+        assert set(result['province']) <= set(REGIONS[rg])
 
 
 def test_province_filter_uses_new_provinces(model):
