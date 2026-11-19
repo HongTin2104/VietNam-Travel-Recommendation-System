@@ -33,8 +33,8 @@ def test_each_old_province_merges_into_exactly_one_new_one():
     assert len(olds) == len(set(olds))
 
 
-def test_evry_new_provinces_has_exactly_one_region():
-    provinces = {province for provinces in REGIONS.values() for province in provinces}
+def test_every_new_provinces_has_exactly_one_region():
+    provinces = {p for ps in REGIONS.values() for p in ps}
     assert sorted(provinces) == NEW_PROVINCES
     assert len(REGIONS) == 6
 
