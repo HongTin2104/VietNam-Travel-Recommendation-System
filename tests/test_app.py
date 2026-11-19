@@ -1,3 +1,6 @@
+import sys
+from pathlib import Path
+
 import pandas as pd
 import pytest
 from streamlit.testing.v1 import AppTest
@@ -5,6 +8,9 @@ from streamlit.testing.v1 import AppTest
 import recommendation
 import translation
 import weather
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+from province_mapping import REGIONS  # noqa: E402
 
 READING = {
     "temperature": 27.5,
@@ -26,12 +32,9 @@ def run_app():
 def search(at, text, region=None, province=None):
     at.text_area[0].input(text)
     if region:
-        at.selectbox[0].select(region)
-        if province and province != f"Tất cả tỉnh, thành khu vực {region}":
-            at.selectbox[1].select(province)
-    else:
-        if province:
-            at.selectbox[1].select(province)
+        at.selectbox[0].select(region).run()
+    if province:
+        at.selectbox[1].select(province)
     at.button[0].click().run()
     assert not at.exception
     return at
@@ -77,8 +80,12 @@ def test_province_filter_limits_results_to_that_province():
 
 
 def test_region_filter_limits_results_to_that_region():
-    at = search(run_app(), "địa điểm du lịch", region="Đồng bằng sông Cửu Long")
-    assert len(at.subheader) > 0
+    region = "Đồng bằng sông Cửu Long"
+    at = search(run_app(), "địa điểm du lịch", region=region)
+    provinces = [m for m in markdown(at) if m.startswith("**Tỉnh, thành:**")]
+    assert len(provinces) == len(at.subheader) > 0
+    assert all(m.removeprefix("**Tỉnh, thành:** ").split(" (")[0] in REGIONS[region] for m in provinces)
+    assert at.selectbox[1].options[1:] == sorted(REGIONS[region])
 
 
 def test_region_and_province_filter_limits_results_to_that_province():

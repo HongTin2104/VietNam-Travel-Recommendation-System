@@ -25,10 +25,12 @@ def recommend_places(
     input_text = preprocess_text(user_input)
     if not input_text:
         return pd.DataFrame(columns=RESULT_COLUMNS)
-    if region:
-        candidates = df[df["region"] == region] if province is None else df[df["province"] == province]
-    else:
-        candidates = df if province is None else df[df["province"] == province]
+
+    candidates = df
+    if region is not None:
+        candidates = candidates[candidates["region"] == region]
+    if province is not None:
+        candidates = candidates[candidates["province"] == province]
     if candidates.empty:
         return pd.DataFrame(columns=RESULT_COLUMNS)
 
