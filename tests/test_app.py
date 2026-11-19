@@ -77,19 +77,14 @@ def test_province_filter_limits_results_to_that_province():
 
 
 def test_region_filter_limits_results_to_that_region():
-    at = search(run_app(), "địa điểm du lịch", region="Đồng Bằng Sông Cửu Long")
-    # regions = [m for m in markdown(at) if m.startswith("**Khu vực:**")]
+    at = search(run_app(), "địa điểm du lịch", region="Đồng bằng sông Cửu Long")
     assert len(at.subheader) > 0
-    # assert all(m.startswith("**Khu vực:** Đồng Bằng Sông Cửu Long") for m in regions)
 
 
 def test_region_and_province_filter_limits_results_to_that_province():
     at = search(run_app(), "một số địa điểm du lịch", region="Bắc Trung Bộ", province="Huế")
-    # regions = [m for m in markdown(at) if m.startswith("**Khu vực**")]
     provinces = [m for m in markdown(at) if m.startswith("**Tỉnh, thành:**")]
-    # assert len(regions) > 0
     assert len(provinces) == len(at.subheader) > 0
-    # assert all(m.startswith("**Khu vực** Bắc Trung Bộ") for m in regions)
     assert all(m.startswith("**Tỉnh, thành:** Huế") for m in provinces)
 
 
