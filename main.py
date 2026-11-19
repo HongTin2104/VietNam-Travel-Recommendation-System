@@ -12,7 +12,8 @@ from translation import translate_to_vietnamese
 from weather import get_api_key, get_weather
 
 DATA_PATH = "data/processed/places.csv"
-ALL_PROVINCES = "Tất cả 34 tỉnh, thành"
+ALL_PROVINCES = "Tất cả tỉnh, thành"
+ALL_REGIONS = "Tất cả các vùng"
 
 
 @st.cache_resource
@@ -29,7 +30,9 @@ st.title("Vietnam Travel Recommendation System")
 st.caption("Dữ liệu đã cập nhật theo 34 tỉnh, thành sau sáp nhập (từ 1/7/2025).")
 
 user_input = st.text_area("Nhập mô tả mong muốn của bạn:")
-province = st.selectbox("Tỉnh, thành", [ALL_PROVINCES, *sorted(df["province"].unique())])
+region = st.selectbox("Vùng", [ALL_REGIONS, *sorted(df["region"].unique())])
+in_region = df if region == ALL_REGIONS else df[df["region"] == region]
+province = st.selectbox("Tỉnh, thành", [ALL_PROVINCES, *sorted(in_region["province"].unique())], key="unit_select")
 
 if st.button("Tìm kiếm"):
     if not user_input.strip():
@@ -55,6 +58,7 @@ if st.button("Tìm kiếm"):
             df,
             tfidf,
             preprocess_fn,
+            region=None if region == ALL_REGIONS else region,
             province=None if province == ALL_PROVINCES else province,
             tfidf_unaccented=tfidf_unaccented,
             unaccented_query=vi_unaccented,

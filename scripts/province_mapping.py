@@ -43,6 +43,26 @@ UNCHANGED = [
     "Cao Bằng",
 ]
 
+# The 6 socio-economic regions for the 34 provinces, from the Resolution 306/NQ-CP 2025.
+REGIONS = {
+    "Trung du và miền núi phía Bắc": [
+        "Cao Bằng",
+        "Điện Biên",
+        "Lai Châu",
+        "Lạng Sơn",
+        "Lào Cai",
+        "Phú Thọ",
+        "Sơn La",
+        "Thái Nguyên",
+        "Tuyên Quang",
+    ],
+    "Đồng bằng sông Hồng": ["Hà Nội", "Hải Phòng", "Ninh Bình", "Hưng Yên", "Bắc Ninh", "Quảng Ninh"],
+    "Bắc Trung Bộ": ["Thanh Hóa", "Nghệ An", "Hà Tĩnh", "Quảng Trị", "Huế"],
+    "Duyên hải Nam Trung Bộ và Tây Nguyên": ["Đà Nẵng", "Quảng Ngãi", "Gia Lai", "Đắk Lắk", "Khánh Hòa", "Lâm Đồng"],
+    "Đông Nam Bộ": ["TP. Hồ Chí Minh", "Đồng Nai", "Tây Ninh"],
+    "Đồng bằng sông Cửu Long": ["Cần Thơ", "Vĩnh Long", "Đồng Tháp", "An Giang", "Cà Mau"],
+}
+
 # Thừa Thiên Huế became the centrally governed Huế city on 1 January 2025, without merging.
 RENAMED = {"Thừa Thiên Huế": "Huế"}
 
@@ -51,3 +71,5 @@ OLD_TO_NEW.update({name: name for name in UNCHANGED if name != "Huế"})
 OLD_TO_NEW.update(RENAMED)
 
 NEW_PROVINCES = sorted(set(OLD_TO_NEW.values()))
+
+PROVINCE_TO_REGION = {province: region for region, provinces in REGIONS.items() for province in provinces}

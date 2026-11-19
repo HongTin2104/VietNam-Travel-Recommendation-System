@@ -1,3 +1,6 @@
+import sys
+from pathlib import Path
+
 import pandas as pd
 import pytest
 
@@ -10,6 +13,10 @@ from data_processing import (
     preprocess_text,
 )
 from recommendation import recommend_places
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+
+from province_mapping import REGIONS
 
 
 @pytest.fixture(scope="module")
@@ -44,6 +51,38 @@ def test_recommends_beaches_for_beach_query(model):
     assert len(result) == 3
     assert result["similarity"].iloc[0] > 0
     assert result["description"].str.contains("biển").all()
+
+
+def test_region_filter_uses_new_regions(model):
+    df, tfidf = model
+    result = recommend_places(
+        "một số địa điểm du lịch", df, tfidf, build_features, region="Duyên hải Nam Trung Bộ và Tây Nguyên"
+    )
+    assert len(result) == 3
+    assert set(result["province"]) <= {"Lâm Đồng", "Đắk Lắk", "Gia Lai", "Đà Nẵng", "Quảng Ngãi", "Khánh Hòa"}
+    assert set(result["old_province"]) <= {
+        "Lâm Đồng",
+        "Đắk Nông",
+        "Bình Thuận",
+        "Đắk Lắk",
+        "Phú Yên",
+        "Gia Lai",
+        "Bình Định",
+        "Đà Nẵng",
+        "Quảng Nam",
+        "Quảng Ngãi",
+        "Kon Tum",
+        "Khánh Hòa",
+        "Ninh Thuận",
+    }
+
+
+def test_filter_result_province_exactly_from_region(model):
+    regions = REGIONS.keys()
+    df, tfidf = model
+    for rg in regions:
+        result = recommend_places("địa điểm tham quan", df, tfidf, build_features, region=rg)
+        assert set(result["province"]) <= set(REGIONS[rg])
 
 
 def test_province_filter_uses_new_provinces(model):

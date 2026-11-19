@@ -34,6 +34,7 @@ identify the places that need replacement links. The script keeps a 0.2-second d
 | `name` | str | Name of the destination. |
 | `province` | str | Province or centrally governed city since 1 July 2025 (34 units). |
 | `old_province` | str | Province before 1 July 2025 (63 units), as in the original sheet. |
+| `region` | str | Region where a province located since 1 July 2025 (based on Resolution 306/NQ-CP). |
 | `description` | str | Short Vietnamese description, median 148 characters. Used for the TF-IDF model. |
 | `rating` | float | Rating out of 5 as written in the sheet. One value is missing. |
 | `keywords` | str | Comma-separated tags. Empty for 100 places. |

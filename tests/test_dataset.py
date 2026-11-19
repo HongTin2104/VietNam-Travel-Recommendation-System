@@ -16,7 +16,7 @@ from build_dataset import (  # noqa: E402
     parse_keywords,
     parse_rating,
 )
-from province_mapping import MERGERS, NEW_PROVINCES, OLD_TO_NEW  # noqa: E402
+from province_mapping import MERGERS, NEW_PROVINCES, OLD_TO_NEW, REGIONS  # noqa: E402
 
 
 def test_mapping_covers_63_old_and_34_new_provinces():
@@ -31,6 +31,12 @@ def test_mapping_covers_63_old_and_34_new_provinces():
 def test_each_old_province_merges_into_exactly_one_new_one():
     olds = [old for group in MERGERS.values() for old in group]
     assert len(olds) == len(set(olds))
+
+
+def test_every_new_provinces_has_exactly_one_region():
+    provinces = {p for ps in REGIONS.values() for p in ps}
+    assert sorted(provinces) == NEW_PROVINCES
+    assert len(REGIONS) == 6
 
 
 def test_parse_rating():
