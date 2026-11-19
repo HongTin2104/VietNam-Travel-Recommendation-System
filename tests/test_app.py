@@ -70,10 +70,10 @@ def test_app_rejects_empty_input():
 
 
 def test_province_filter_limits_results_to_that_province():
-    at = search(run_app(), "địa điểm tham quan", province="Hà Nội")
+    at = search(run_app(), "địa điểm tham quan", province="Huế")
     provinces = [m for m in markdown(at) if m.startswith("**Tỉnh, thành:**")]
     assert len(provinces) == len(at.subheader) > 0
-    assert all(m.startswith("**Tỉnh, thành:** Hà Nội") for m in provinces)
+    assert all(m.startswith("**Tỉnh, thành:** Huế") for m in provinces)
 
 
 def test_region_filter_limits_results_to_that_region():
