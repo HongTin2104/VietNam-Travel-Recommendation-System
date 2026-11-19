@@ -1,3 +1,6 @@
+import sys
+from pathlib import Path
+
 import pandas as pd
 import pytest
 
@@ -10,11 +13,11 @@ from data_processing import (
     preprocess_text,
 )
 from recommendation import recommend_places
-import sys
-from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
 from province_mapping import REGIONS
+
 
 @pytest.fixture(scope="module")
 def model():
@@ -79,7 +82,7 @@ def test_filter_result_province_exactly_from_region(model):
     df, tfidf = model
     for rg in regions:
         result = recommend_places("địa điểm tham quan", df, tfidf, build_features, region=rg)
-        assert set(result['province']) <= set(REGIONS[rg])
+        assert set(result["province"]) <= set(REGIONS[rg])
 
 
 def test_province_filter_uses_new_provinces(model):
